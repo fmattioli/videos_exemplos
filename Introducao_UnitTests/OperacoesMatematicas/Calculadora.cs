@@ -1,12 +1,7 @@
 ﻿namespace OperacoesMatematicas
 {
-    public class Calculadora : ICalculadora
+    public class Calculadora
     {
-        public int RealizarCalculos(int num1, int num2)
-        {
-            return Somar(num1, num2);
-        }
-
         public int Somar(int num1, int num2)
         {
             return num1 + num2;
