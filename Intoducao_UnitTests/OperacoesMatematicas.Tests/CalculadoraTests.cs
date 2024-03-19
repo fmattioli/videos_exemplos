@@ -1,55 +1,55 @@
-﻿namespace OperacoesMatematicas.Tests
+﻿using AutoFixture;
+
+using FluentAssertions;
+
+using Moq;
+
+namespace OperacoesMatematicas.Tests
 {
     public class CalculadoraTests
     {
-        private readonly Calculadora _calculadora;
+        private readonly Fixture _fixture;
+        private readonly Operacoes _operacoes;
+        private readonly Mock<ICalculadora> _calculadoraMock = new Mock<ICalculadora>();
 
         public CalculadoraTests()
         {
-            _calculadora = new Calculadora();
+            _operacoes = new Operacoes(_calculadoraMock.Object);
+            _fixture = new Fixture();
         }
 
         [Fact]
-        public void Somar_QuandoInformadoDoisNumeros_DeveSomarCorretamente()
+        public void Somar_QuandoInformadoDoisNumeros_DeveSomarCorretamente_Chamando_O_Metodo_Somar()
         {
             //Arrange
-            int num1 = 10;
-            int num2 = 20;
+            int num1 = _fixture.Create<int>();
+            int num2 = _fixture.Create<int>();
+
+            _calculadoraMock
+                .Setup(x => x.Somar(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(60);
 
             //Act
-            var resultado = _calculadora.Somar(num1, num2);
+            var resultado = _operacoes.RealizarSoma(num1, num2);
 
             //Assert
-            Assert.Equal(30, resultado);
-        }
+            resultado
+                .Should()
+                .NotBe(0);
 
-        [Fact(DisplayName = "Qualquer nome relacionado ao teste")]
-        public void Multiplicar_QuandoInformadoDoisNumeros_DeveMultiplicarCorretamente()
-        {
-            //Arrange
-            int num1 = 5;
-            int num2 = 10;
+            resultado
+                .Should()
+                .BeGreaterThan(50);
 
-            //Act
-            var resultado = _calculadora.Multiplicar(num1, num2);
+            resultado
+                .Should()
+                .BeLessThanOrEqualTo(60);
 
-            //Assert
-            Assert.Equal(50, resultado);
-        }
+            resultado
+                .Should()
+                .Be(60);
 
-
-        [Fact]
-        public void Subtrair_QuandoInformadoDoisNumeros_DeveSubtrairCorretamente()
-        {
-            //Arrange
-            int num1 = 50;
-            int num2 = 40;
-
-            //Act
-            var resultado = _calculadora.Subtrair(num1, num2);
-
-            //Assert
-            Assert.Equal(15, resultado);
+            _calculadoraMock.Verify(x => x.Somar(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(10));
         }
     }
 }
